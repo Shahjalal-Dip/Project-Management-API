@@ -46,24 +46,24 @@ namespace ProjectManagementApp.Controllers
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 return Unauthorized("Invalid credentials");
 
-            var claims = new List<Claim> { 
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.Role)
+            var claims = new List<Claim>
+            {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
             };
 
             var identity = new ClaimsIdentity(claims, "Cookies");
             await HttpContext.SignInAsync("Cookies", new ClaimsPrincipal(identity),
-                 new AuthenticationProperties
-                 {
-                     IsPersistent = dto.RememberMe, 
-                     ExpiresUtc = DateTime.UtcNow.AddDays(dto.RememberMe ? 7 : 1)
-                 });
+                new AuthenticationProperties
+                {
+                    IsPersistent = dto.RememberMe,
+                    ExpiresUtc = DateTime.UtcNow.AddDays(dto.RememberMe ? 7 : 1)
+                });
 
             HttpContext.Session.SetString("User", user.Username);
 
             return Ok("Logged in successfully");
         }
-
 
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
